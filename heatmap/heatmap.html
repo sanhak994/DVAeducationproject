@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Socioeconomic variability among States</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Bebas+Neue|Montserrat&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../main_style.css">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="bg-dark">
+
+
+    <!--NAVBAR -->
+    <div class="">
+      <nav class="navbar navbar-expand-lg navbar-light fixed-top" style="background-color: #fcba03;">
+        <a class="navbar-brand" href="#">
+          <img src="../static_images/techlogo.png" width="50" height="30" alt="">
+        </a>
+        <a class="navbar-brand pl-1" href="../index.html">Quantifying Academic Success</a>
+          <ul class="navbar-nav ml-auto pr-5">
+            <li class="nav-item"><a class="nav-link" href="../index.html">Prediction App</a></li>
+            <li class="nav-item"><a class="nav-link" href="../StatesMap/multi_map.html">Choropleth</a></li>
+            <li class="nav-item"><a class="nav-link" href="../heatmap/heatmap.html">Heatmap</a></li>
+          </ul>
+      </nav>
+    </div>
+    <!--NAVBAR -->
+
+  <svg height=80></svg>
+
+    <div class="container">
+        <h2 class='text-white text-center'>Socioeconomic Variations</h2>
+        <div class="text-center">
+          <div class="dropdown">
+              <button class="dropbtn">Select Metric</button>
+              <div class="catfilter"></div>
+          </div>
+
+        </div>
+
+    </div>
+
+
+
+
+
+      <div class="titleDropdown"></div>
+
+
+      <!-- <p class='range'>Range</p></div> -->
+
+      <div id="tooltip"></div>
+
+      <div id="my_dataviz"></div>
+
+      <div class="firstrow"></div>
+  </div>
+  </body>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="heatmap.js"></script>
+</html>

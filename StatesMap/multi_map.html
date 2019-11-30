@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Educational Success</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link href="https://fonts.googleapis.com/css?family=Bebas+Neue|Montserrat&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="../main_style.css">
+
+
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <!-- <script type="text/javascript" src="../lib/d3.v5.min.js"></script> -->
+        <script type="text/javascript" src="topojson.v2.min.js"></script>
+        <!-- <script type="text/javascript" src="../lib/d3-tip.min.js"></script> -->
+        <style type="text/css">
+            .d3-tip {
+                line-height: 1;
+                font-weight: bold;
+                padding: 12px;
+                background: rgba(0, 0, 0, 0.8);
+                color: #fff;
+                border-radius: 2px;
+            }
+        </style>
+        <style>
+        svg {
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
+          /* width: 80%; */
+          /* border: 3px solid green; */
+          /* padding: 10px; */
+        }
+        #play-button {
+            position: absolute;
+            top: 650px;
+            left: 500px;
+            background: #6baed6;
+            padding-right: 26px;
+            border-radius: 3px;
+            border: none;
+            color: white;
+            margin: 0;
+            padding: 0 12px;
+            width: 400px;
+            cursor: pointer;
+            height: 30px;
+        }
+        #play-button:hover {
+            background-color: #c6dbef;
+        }
+        #next-button {
+            position: absolute;
+            top: 650px;
+            left: 905px;
+            background: #6baed6;
+            padding-right: 26px;
+            border-radius: 3px;
+            border: none;
+            color: white;
+            margin: 0;
+            padding: 0 12px;
+            width: 60px;
+            cursor: pointer;
+            height: 30px;
+        }
+        #next-button:hover {
+            background-color: #c6dbef;
+        }
+        #prev-button {
+            position: absolute;
+            top: 650px;
+            left: 435px;
+            background: #6baed6;
+            padding-right: 26px;
+            border-radius: 3px;
+            border: none;
+            color: white;
+            margin: 0;
+            padding: 0 12px;
+            width: 60px;
+            cursor: pointer;
+            height: 30px;
+        }
+        #prev-button:hover {
+            background-color: #c6dbef;
+        }
+        </style>
+
+    </head>
+
+    <body class="bg-dark">
+      <!--NAVBAR -->
+      <div class="">
+        <nav class="navbar navbar-expand-lg navbar-light fixed-top" style="background-color: #fcba03;">
+          <a class="navbar-brand" href="#">
+            <img src="../static_images/techlogo.png" width="50" height="30" alt="">
+          </a>
+          <a class="navbar-brand pl-1" href="../index.html">Quantifying Academic Success</a>
+            <ul class="navbar-nav ml-auto pr-5">
+              <li class="nav-item"><a class="nav-link" href="../Rshiny.html">Prediction App</a></li>
+              <li class="nav-item"><a class="nav-link" href="../StatesMap/multi_map.html">Choropleth</a></li>
+              <li class="nav-item"><a class="nav-link" href="../heatmap/heatmap.html">Heatmap</a></li>
+            </ul>
+        </nav>
+      </div>
+      <!--NAVBAR -->
+      <svg height=20></svg>
+
+        <div id="vis">
+            <button id="play-button">Play</button>
+        </div>
+        <div id="vis">
+            <button id="next-button">Next</button>
+        </div>
+        <div id="vis">
+            <button id="prev-button">Prev</button>
+        </div>
+        <script type="text/javascript">
+            //#696969 gray
+            //#ffa500 orange
+            var parseYear = d3.timeParse("%Y");
+            Promise.all([
+            d3.dsv(",", "Prediction_inflation_adjusted.csv", function(quake) {
+                var quakes = {states: quake.STATE,
+                            year: quake.YEAR,
+                            total: +quake["AVG_ALL_SCORES"]};
+                return quakes;
+            }),
+            d3.dsv(",", "state_coefficients.csv", function(coefs){
+                return coefs;
+            })
+            ]).then(function(quakes){
+                console.log(quakes[0]);
+                //getting maximum and minimum vals for the color scale and legend
+                var global_max = []
+                for (var i = 0; i < quakes[0].length; i++) {
+                    if(quakes[0][i].total != 0 ){//&& (quakes[i].year == "2003" || quakes[i].year == "2009")) {
+                        global_max.push(quakes[0][i].total);
+                    }
+                }
+                //function to filter data by year
+                function checkYear(row) {
+                    return row.year == "2003" && row.total != 0;
+                }
+                //transforming data to match with json file state names
+                function lowerCaseAllWordsExceptFirstLetters(string) {
+                    return string.replace(/\w\S*/g, function (word) {
+                        return word.charAt(0) + word.slice(1).toLowerCase();
+                    });
+                }
+                //filtering for the year we want
+                quakes[0] = quakes[0].filter(checkYear)
+                for (var i = 0; i < quakes[0].length; i++) {
+                    temp = quakes[0][i].states.split("_");
+                    for (var j = 0; j < temp.length; j++) {
+                        temp[j] = lowerCaseAllWordsExceptFirstLetters(temp[j]);
+                    }
+                    quakes[0][i].states = temp.join(" ");
+                }
+                console.log(quakes[0]);
+                //creating the svg and map projection
+                var w = 1200;
+                var h = 700;
+                var padding = 100;
+                var svg = d3.select("body")
+                    .append("svg")
+                    .attr("width", w)
+                    .attr("height", h);
+                var projection = d3.geoAlbersUsa()
+                    .scale(1000)
+                    .translate([w/2, h/2]);
+                var path = d3.geoPath()
+                    .projection(projection);
+                //adding the legend
+                var max = []
+                for (var i = 0; i < quakes[0].length; i++) {
+                    max.push(quakes[0][i].total);
+                }
+                //creating our color scales
+                var hexColors = ['#f7fbff','#deebf7','#c6dbef','#9ecae1','#6baed6','#4292c6','#2171b5','#08519c','#08306b'];
+                var legendColor = d3.scaleOrdinal()
+                    .domain([0,1,2,3,4,5,6,7,8])
+                    .range(hexColors);
+                var inc = (d3.max(global_max) - d3.min(global_max))/9
+                var thresh = []
+                for (var i = 0; i < 9; i++) {
+                    go = d3.min(global_max) + inc*(i+1)
+                    thresh.push(go.toFixed(2));
+                }
+                var colorScale = d3.scaleQuantile()
+                    .domain(thresh)
+                    .range(hexColors);
+                for (var i = 0; i <= 8; i++) {
+                    svg.append("rect")
+                        .attr("class", "legend" + i)
+                        .attr("x", w-20)
+                        .attr("y", padding + i*20)
+                        .attr("width", 20)
+                        .attr("height", 20)
+                        .attr("fill", legendColor(i));
+                    svg.append("text")
+                        .attr("class", "legend" + i)
+                        .attr("x", w-22)
+                        .attr("y", 15+padding + i*20)
+                        .attr("text-anchor", "end")
+                        .attr("font-size", "10px")
+                        .text(thresh[i])
+                        .style('fill', 'white');
+                }
+                svg.append("text")
+                    .attr("class", "legtitle")
+                    .attr("x", w)
+                    .attr("y", padding-10)
+                    .attr("text-anchor", "end")
+                    .text("Average Standardized Score")
+                    .style('fill', 'white');
+                svg.append("text")
+                    .attr("class", "title")
+                    .attr("x", w/1.5)
+                    .attr("y", padding-20)
+                    .attr("text-anchor", "end")
+                    .attr("font-size", "24px")
+                    .style("font-weight", "bold")
+                    .text("Academic Success by State - " + quakes[0][0].year )
+                    .style('fill', 'white');
+                var promises = [d3.json("states-10m.json")]
+                Promise.all(promises).then(ready)
+                function ready([us]) {
+                    svg.append("g")
+                        .attr("class", "states")
+                        .selectAll("path")
+                        .data(topojson.feature(us, us.objects.states).features)
+                        .enter().append("path")
+                        .style("stroke", "white")
+                        .style("stroke-width", 1)
+                        .attr("d", path)
+                        .style("fill", function(d){
+                            var total = 0;
+                            for (var i = 0; i < quakes[0].length; i++) {
+                                if (d["properties"].name == quakes[0][i].states) {
+                                    total = quakes[0][i].total;
+                                }
+                            }
+                            return colorScale(total);
+                        })
+                        .each(function(){
+                            var sel = d3.select(this);
+                            sel.on("click", onClick);
+                            sel.on("dblclick", reset);
+                            sel.on("mouseover", onMouseover)
+                            sel.on("mouseout", onMouseout);
+                        });
+                }
+                var playButton = d3.select("#play-button");
+                var nextButton = d3.select("#next-button");
+                var prevButton = d3.select("#prev-button");
+                var num_runs = 0;
+                var update_years = ["2003","2005", "2007", "2009", "2011", "2013", "2015"];
+                playButton
+                    .on("click", function() {
+                        var button = d3.select(this);
+                        if (button.text() == "Pause") {
+                            clearInterval(timer);
+                            button.text("Play");
+                        } else {
+                            var timer = setInterval(function(){
+                                num_runs += 1;
+                                playButton.on("click", function(){
+                                    if(d3.select(this).text() == "Pause"){
+                                        clearInterval(timer);
+                                        d3.select(this).text("Play");
+                                    } else {
+                                        timer = setInterval(function(){
+                                            num_runs+=1
+                                            var when = update(global_max, update_years[num_runs], num_runs);
+                                            if(when == "invalid"){
+                                                clearInterval(timer);
+                                                button.text("Play");
+                                                num_runs-=1;
+                                            }
+                                        }, 1000);
+                                        button.text("Pause");
+                                    }
+                                });
+                                var when = update(global_max, update_years[num_runs], num_runs);
+                                if(when == "invalid"){
+                                    clearInterval(timer);
+                                    button.text("Play");
+                                    num_runs-=1;
+                                }
+                            }, 1000);
+                            button.text("Pause");
+                        }
+                    });
+                    nextButton
+                    .on("click", function() {
+                        if(num_runs < update_years.length-1){
+                            num_runs += 1;
+                        }
+                        update(global_max, update_years[num_runs], num_runs);
+                    });
+                    prevButton
+                    .on("click", function() {
+                        if(num_runs >= 1){
+                            num_runs -= 1;
+                        }
+                        update(global_max, update_years[num_runs], num_runs);
+                    });
+                function update(global_max, new_year, num_runs) {
+                    if(num_runs >= 7) {
+                        return "invalid";
+                    }
+                    svg.selectAll("text.legend").remove();
+                    Promise.all([
+                    d3.dsv(",", "Prediction_inflation_adjusted.csv", function(quake) {
+                        var quakes = {states: quake.STATE,
+                                    year: quake.YEAR,
+                                    total: +quake["AVG_ALL_SCORES"]};
+                        return quakes;
+                    }),
+                    d3.dsv(",", "state_coefficients.csv", function(coefs){
+                        return coefs;
+                    })
+                    ]).then(function(quakes){
+                        console.log(new_year);
+                        //transforming data
+                        function checkYear(row) {
+                            return row.year == new_year && row.total != 0;
+                        }
+                        function lowerCaseAllWordsExceptFirstLetters(string) {
+                            return string.replace(/\w\S*/g, function (word) {
+                                return word.charAt(0) + word.slice(1).toLowerCase();
+                            });
+                        }
+                        quakes[0] = quakes[0].filter(checkYear)
+                        for (var i = 0; i < quakes[0].length; i++) {
+                            temp = quakes[0][i].states.split("_");
+                            for (var j = 0; j < temp.length; j++) {
+                                temp[j] = lowerCaseAllWordsExceptFirstLetters(temp[j]);
+                            }
+                            quakes[0][i].states = temp.join(" ");
+                        }
+                        svg.selectAll("text.title").style("font-weight", "bold").text("Academic Success by State - " + quakes[0][0].year);
+                        var max = []
+                        for (var i = 0; i < quakes[0].length; i++) {
+                            max.push(quakes[0][i].total);
+                        }
+                        var inc = (d3.max(global_max) - d3.min(global_max))/9
+                        var thresh = []
+                        for (var i = 0; i < 9; i++) {
+                            go = d3.min(global_max) + inc*(i+1)
+                            thresh.push(go.toFixed(2));
+                        }
+                        var new_hexColors = ['#f7fbff','#deebf7','#c6dbef','#9ecae1','#6baed6','#4292c6','#2171b5','#08519c','#08306b'];
+                        var new_legendColor = d3.scaleOrdinal()
+                            .domain([0,1,2,3,4,5,6,7,8])
+                            .range(new_hexColors);
+                        var colorScale = d3.scaleQuantile()
+                            .domain(thresh)
+                            .range(new_hexColors);
+                        for (var i = 0; i <= 8; i++) {
+                            svg.select("rect.legend" + i)
+                                .attr("fill", new_legendColor(i));
+                            svg.select("text.legend" + i)
+                                .text(thresh[i]);
+                        }
+                        var promises = [d3.json("states-10m.json")]
+                        Promise.all(promises).then(ready)
+                        function ready([us]) {
+                    //adding the tooltip
+                    /*
+                    var tip = d3.tip()
+                        .attr("class", "d3-tip")
+                        .offset([-10,0])
+                        .html(function(d){
+                            for (var i = 0; i < quakes.length; i++) {
+                                if (d["properties"].name == quakes[i].states) {
+                                    return "<strong>State: " + quakes[i].states + "</strong><br><strong>Year: " + quakes[i].year + "</strong><br><strong>Math 4 Score: " + quakes[i].total.toFixed(2) + "</strong>";
+                                }
+                            }
+                        });
+                    svg.call(tip);
+                    */
+                    svg.append("g")
+                        .attr("class", "states")
+                        .selectAll("path")
+                        .data(topojson.feature(us, us.objects.states).features)
+                        .enter().append("path")
+                        .style("stroke", "white")
+                        .style("stroke-width", 1)
+                        .attr("d", path)
+                        .style("fill", function(d){
+                            var total = 0;
+                            for (var i = 0; i < quakes[0].length; i++) {
+                                if (d["properties"].name == quakes[0][i].states) {
+                                    total = quakes[0][i].total;
+                                }
+                            }
+                            return colorScale(total);
+                        })
+                        .each(function(){
+                            var sel = d3.select(this);
+                            sel.on("click", onClick);
+                            sel.on("dblclick", reset);
+                            sel.on("mouseover", onMouseover);
+                            sel.on("mouseout", onMouseout);
+                            function onMouseout() {
+                                d3.select(this)
+                                    .style("fill", function(d){
+                                        var total = 0;
+                                        for (var i = 0; i < quakes[0].length; i++) {
+                                            if (d["properties"].name == quakes[0][i].states) {
+                                                total = quakes[0][i].total;
+                                            }
+                                        }
+                                        return colorScale(total);
+                                    })
+                            };
+                        });
+                }
+                    });
+                return "valid";
+                }
+                function onMouseover() {
+                    d3.select(this)
+                        .style("fill", "orange");
+                };
+                function onMouseout() {
+                    d3.select(this)
+                        .style("fill", function(d){
+                            var total = 0;
+                            for (var i = 0; i < quakes[0].length; i++) {
+                                if (d["properties"].name == quakes[0][i].states) {
+                                    total = quakes[0][i].total;
+                                }
+                            }
+                            return colorScale(total);
+                        })
+                };
+                function onClick(d) {
+                        d3.selectAll(".info").remove();
+                        d3.selectAll(".tip").remove();
+                        var bounds = path.bounds(d),
+                            dx = (bounds[1][0] - bounds[0][0]),
+                            dy = bounds[1][1] - bounds[0][1],
+                            x = (bounds[0][0] + bounds[1][0])/2,
+                            y = (bounds[0][1] + bounds[1][1])/2,
+                            scale = .5 / Math.max(dx / w, dy / h),
+                            translate = [(w/2 - x)*scale-dx, (h/2 - y)*scale];
+                        svg.transition()
+                            .duration(1000)
+                            .style("stroke-width", 1 + "px")
+                            .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
+                        var off = 20;
+                        svg.append("rect")
+                            .attr("class", "info")
+                            .attr("x", bounds[1][0] + 50/scale)
+                            .attr("y", bounds[0][1]- 100/scale)
+                            .attr("width",  400/scale + "px")
+                            .attr("height",  600/scale+ "px")
+                            .attr("rx", 5)
+                            .style("opacity", 0.8)
+                            .style("fill", "black");
+                        svg.append("text")
+                            .attr("class", "info")
+                            .attr("x", bounds[1][0] + 250/scale)
+                            .attr("y", bounds[0][1] - 40/scale + off/scale)
+                            .attr("text-anchor", "middle")
+                            .attr('fill', 'white')
+                            .attr("font-size", off/scale + "px")
+                            .text(d.properties.name);
+                        svg.append("text")
+                            .attr("class", "info")
+                            .attr("x", bounds[1][0] + 250/scale)
+                            .attr("y", bounds[0][1] - 40/scale + 2.5*(off/scale))
+                            .attr("text-anchor", "middle")
+                            .attr('fill', 'white')
+                            .attr("font-size", off/scale + "px")
+                            .html(function(){
+                                for (var i = 0; i < quakes[0].length; i++) {
+                                    if (d["properties"].name == quakes[0][i].states) {
+                                        return "Score: " + quakes[0][i].total.toFixed(2);
+                                    }
+                                }
+                            });
+                            d3.selectAll(".tip").remove();
+                            var feats = ["TOTAL_REVENUE","INSTR_TOTAL_EXP_RATIO", "MEDIAN_INCOME", "ALL_STUDENT_TEACHER_RATIO", "avg_att_rate", "povrate"];
+                            for (var i = 0; i < quakes[1].length; i++) {
+                                temp = quakes[1][i].STATE.split("_");
+                                for (var j = 0; j < temp.length; j++) {
+                                    temp[j] = lowerCaseAllWordsExceptFirstLetters(temp[j]);
+                                }
+                                quakes[1][i].STATE = temp.join(" ");
+                            }
+                            var yScale = d3.scaleBand()
+                                .domain(feats)
+                                .range([h-padding, padding]);
+                            var xScale = d3.scaleLinear()
+                                .domain([0, d3.max(max)])
+                                .range([padding, w]);
+                            for (var i = 0; i < quakes[1].length; i++) {
+                                    if (d["properties"].name == quakes[1][i].STATE) {
+                                        var estimates = [];
+                                        for (var k = 0; k < feats.length; k++) {
+                                            estimates.push(quakes[1][i][feats[k]]);
+                                        }
+                                        for (var j = 0; j < feats.length; j++) {
+                                            /*
+                                            svg.append("circle")
+                                                .attr("class", "tip")
+                                                .attr("cx",bounds[1][0] + 250/scale)
+                                                .attr("cy", bounds[0][1] -80/scale + 3*(j+3)*(off/scale))
+                                                .attr("r",sizeScale(Math.log(Math.abs(quakes[1][i][feats[j]])), scale))
+                                                .style("fill", "orange");
+                                            */
+                                            svg.append("text")
+                                                .attr("class", "tip")
+                                                .attr("x", bounds[1][0] + 390/scale)
+                                                .attr("y", bounds[0][1] + 1.5*(j+4)*(off/scale))
+                                                .attr("text-anchor", "end")
+                                                .attr('fill', 'white')
+                                                .attr("font-size", off/scale + "px")
+                                                .text(feats[j]);
+                                            svg.append("rect")
+                                                .attr("class", "tip")
+                                                .attr("x", bounds[1][0] + 400/scale)
+                                                .attr("y", bounds[0][1] + 1.5*(j+4)*(off/scale) - off/scale)
+                                                .attr("width", sizeScale(Math.abs(quakes[1][i][feats[j]]), scale))
+                                                .attr("height", off/scale)
+                                                .style("fill", "orange");
+                                            /*
+                                            svg.append("text")
+                                                .attr("class", "tip")
+                                                .attr("x", bounds[1][0] + 250/scale)
+                                                .attr("y", bounds[0][1] -100/scale + 3*(j+3)*(off/scale))
+                                                .attr("text-anchor", "middle")
+                                                .attr('fill', 'white')
+                                                .attr("font-size", off/scale + "px")
+                                                .text(feats[j]);
+                                            */
+                                        }
+                                    }
+                                }
+                };
+                function sizeScale(input, scale){
+                    if(input < 4/scale){
+                        return 4/scale;
+                    }
+                    else{
+                        return input;
+                    }
+                }
+                function reset(){
+                    d3.selectAll(".info").remove();
+                    d3.selectAll(".tip").remove();
+                    d3.selectAll("circle").remove();
+                    svg.transition()
+                        .duration(1000)
+                        .style("stroke-width", "1px")
+                        .attr('transform', 'translate('+0+','+0+')scale(' + 1 + ")");
+                };
+            });
+        </script>
+    </body>
+</html>
