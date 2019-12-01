@@ -3,7 +3,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>Educational Success</title>
+        <title>Academic Success by State</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <link href="https://fonts.googleapis.com/css?family=Bebas+Neue|Montserrat&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="../main_style.css">
@@ -35,7 +35,7 @@
           /* border: 3px solid green; */
           /* padding: 10px; */
         }
-        
+
 
         </style>
 
@@ -72,7 +72,7 @@
       <!--NAVBAR -->
       <svg height=20></svg>
 
-        
+
         <script type="text/javascript">
             //#696969 gray
             //#ffa500 orange
@@ -342,12 +342,12 @@
                             button.text("Play");
                         } else {
                             console.log("play");
-                            var timer = setInterval(function(){ 
+                            var timer = setInterval(function(){
                                 num_runs += 1;
                                 button.on("click", function(){
                                     if(button.text() == "Pause"){
                                         clearInterval(timer);
-                                        button.text("Play"); 
+                                        button.text("Play");
                                     } else {
                                         timer = setInterval(function(){
                                             num_runs+=1
@@ -360,9 +360,9 @@
                                         }, 1000);
                                         button.text("Pause");
                                     }
-                                    
+
                                 });
-                                var when = update(global_max, update_years[num_runs], num_runs); 
+                                var when = update(global_max, update_years[num_runs], num_runs);
                                 if(when == "invalid"){
                                     clearInterval(timer);
                                     button.text("Play");
