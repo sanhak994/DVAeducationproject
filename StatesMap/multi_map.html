@@ -22,6 +22,9 @@
                 color: #fff;
                 border-radius: 2px;
             }
+            text{
+              color:white;
+            }
         </style>
         <style>
         svg {
@@ -34,8 +37,8 @@
         }
         #play-button {
             position: absolute;
-            top: 650px;
-            left: 500px;
+            top: 1050px;
+            left: 600px;
             background: #6baed6;
             padding-right: 26px;
             border-radius: 3px;
@@ -52,8 +55,8 @@
         }
         #next-button {
             position: absolute;
-            top: 650px;
-            left: 905px;
+            top: 1050px;
+            left: 1005px;
             background: #6baed6;
             padding-right: 26px;
             border-radius: 3px;
@@ -70,8 +73,8 @@
         }
         #prev-button {
             position: absolute;
-            top: 650px;
-            left: 435px;
+            top: 1050px;
+            left: 535px;
             background: #6baed6;
             padding-right: 26px;
             border-radius: 3px;
@@ -105,6 +108,19 @@
             </ul>
         </nav>
       </div>
+      <svg height=100></svg>
+      <div class="container">
+        <div class="jumbotron">
+          <h3>Instructions</h3>
+          <ul>
+            <li>Click on state to see detailed breakdown</li>
+            <li>Double click to zoom back out</li>
+            <li>Use buttons at bottom to progress by year</li>
+          </ul>
+
+        </div>
+
+      </div>
       <!--NAVBAR -->
       <svg height=20></svg>
 
@@ -128,11 +144,13 @@
                             total: +quake["AVG_ALL_SCORES"]};
                 return quakes;
             }),
-            d3.dsv(",", "state_coefficients.csv", function(coefs){
+            d3.dsv(",", "default_state_coefficients.csv", function(coefs){
                 return coefs;
             })
             ]).then(function(quakes){
-                console.log(quakes[0]);
+                // console.log(quakes[0]);
+                // console.log(quakes[1]);
+
                 //getting maximum and minimum vals for the color scale and legend
                 var global_max = []
                 for (var i = 0; i < quakes[0].length; i++) {
@@ -140,6 +158,8 @@
                         global_max.push(quakes[0][i].total);
                     }
                 }
+
+
                 //function to filter data by year
                 function checkYear(row) {
                     return row.year == "2003" && row.total != 0;
@@ -150,8 +170,10 @@
                         return word.charAt(0) + word.slice(1).toLowerCase();
                     });
                 }
+
                 //filtering for the year we want
                 quakes[0] = quakes[0].filter(checkYear)
+
                 for (var i = 0; i < quakes[0].length; i++) {
                     temp = quakes[0][i].states.split("_");
                     for (var j = 0; j < temp.length; j++) {
@@ -159,30 +181,41 @@
                     }
                     quakes[0][i].states = temp.join(" ");
                 }
-                console.log(quakes[0]);
+
+
+
+                // console.log(quakes[0]);
+
                 //creating the svg and map projection
                 var w = 1200;
                 var h = 700;
                 var padding = 100;
+
                 var svg = d3.select("body")
                     .append("svg")
                     .attr("width", w)
                     .attr("height", h);
+
                 var projection = d3.geoAlbersUsa()
                     .scale(1000)
                     .translate([w/2, h/2]);
+
                 var path = d3.geoPath()
                     .projection(projection);
+
                 //adding the legend
                 var max = []
                 for (var i = 0; i < quakes[0].length; i++) {
                     max.push(quakes[0][i].total);
                 }
+
+
                 //creating our color scales
                 var hexColors = ['#f7fbff','#deebf7','#c6dbef','#9ecae1','#6baed6','#4292c6','#2171b5','#08519c','#08306b'];
                 var legendColor = d3.scaleOrdinal()
                     .domain([0,1,2,3,4,5,6,7,8])
                     .range(hexColors);
+
                 var inc = (d3.max(global_max) - d3.min(global_max))/9
                 var thresh = []
                 for (var i = 0; i < 9; i++) {
@@ -192,6 +225,8 @@
                 var colorScale = d3.scaleQuantile()
                     .domain(thresh)
                     .range(hexColors);
+
+
                 for (var i = 0; i <= 8; i++) {
                     svg.append("rect")
                         .attr("class", "legend" + i)
@@ -200,6 +235,7 @@
                         .attr("width", 20)
                         .attr("height", 20)
                         .attr("fill", legendColor(i));
+
                     svg.append("text")
                         .attr("class", "legend" + i)
                         .attr("x", w-22)
@@ -216,6 +252,8 @@
                     .attr("text-anchor", "end")
                     .text("Average Standardized Score")
                     .style('fill', 'white');
+
+
                 svg.append("text")
                     .attr("class", "title")
                     .attr("x", w/1.5)
@@ -225,9 +263,16 @@
                     .style("font-weight", "bold")
                     .text("Academic Success by State - " + quakes[0][0].year )
                     .style('fill', 'white');
+
+
+
                 var promises = [d3.json("states-10m.json")]
+
                 Promise.all(promises).then(ready)
+
                 function ready([us]) {
+
+
                     svg.append("g")
                         .attr("class", "states")
                         .selectAll("path")
@@ -252,15 +297,20 @@
                             sel.on("mouseover", onMouseover)
                             sel.on("mouseout", onMouseout);
                         });
+
                 }
+
                 var playButton = d3.select("#play-button");
                 var nextButton = d3.select("#next-button");
                 var prevButton = d3.select("#prev-button");
+
                 var num_runs = 0;
                 var update_years = ["2003","2005", "2007", "2009", "2011", "2013", "2015"];
+
                 playButton
                     .on("click", function() {
                         var button = d3.select(this);
+
                         if (button.text() == "Pause") {
                             clearInterval(timer);
                             button.text("Play");
@@ -283,6 +333,7 @@
                                         }, 1000);
                                         button.text("Pause");
                                     }
+
                                 });
                                 var when = update(global_max, update_years[num_runs], num_runs);
                                 if(when == "invalid"){
@@ -291,9 +342,11 @@
                                     num_runs-=1;
                                 }
                             }, 1000);
+
                             button.text("Pause");
                         }
                     });
+
                     nextButton
                     .on("click", function() {
                         if(num_runs < update_years.length-1){
@@ -301,6 +354,7 @@
                         }
                         update(global_max, update_years[num_runs], num_runs);
                     });
+
                     prevButton
                     .on("click", function() {
                         if(num_runs >= 1){
@@ -308,11 +362,27 @@
                         }
                         update(global_max, update_years[num_runs], num_runs);
                     });
+
+                    //rotations text
+                    /*
+                    svg.append("text")
+                        .attr("x", 100)
+                        .attr("y", 100)
+                        .attr("font-size", "30px")
+                        .attr("stroke", "red")
+                        .attr("text-anchor", "end")
+                        .attr("transform", "rotate(-20, 100, 100)")
+                        .text("TESTER");
+                    */
+
+
                 function update(global_max, new_year, num_runs) {
                     if(num_runs >= 7) {
                         return "invalid";
                     }
+
                     svg.selectAll("text.legend").remove();
+
                     Promise.all([
                     d3.dsv(",", "Prediction_inflation_adjusted.csv", function(quake) {
                         var quakes = {states: quake.STATE,
@@ -320,11 +390,12 @@
                                     total: +quake["AVG_ALL_SCORES"]};
                         return quakes;
                     }),
-                    d3.dsv(",", "state_coefficients.csv", function(coefs){
+                    d3.dsv(",", "default_state_coefficients.csv", function(coefs){
                         return coefs;
                     })
                     ]).then(function(quakes){
-                        console.log(new_year);
+
+                        // console.log(new_year);
                         //transforming data
                         function checkYear(row) {
                             return row.year == new_year && row.total != 0;
@@ -334,7 +405,9 @@
                                 return word.charAt(0) + word.slice(1).toLowerCase();
                             });
                         }
+
                         quakes[0] = quakes[0].filter(checkYear)
+
                         for (var i = 0; i < quakes[0].length; i++) {
                             temp = quakes[0][i].states.split("_");
                             for (var j = 0; j < temp.length; j++) {
@@ -342,7 +415,9 @@
                             }
                             quakes[0][i].states = temp.join(" ");
                         }
+
                         svg.selectAll("text.title").style("font-weight", "bold").text("Academic Success by State - " + quakes[0][0].year);
+
                         var max = []
                         for (var i = 0; i < quakes[0].length; i++) {
                             max.push(quakes[0][i].total);
@@ -353,36 +428,32 @@
                             go = d3.min(global_max) + inc*(i+1)
                             thresh.push(go.toFixed(2));
                         }
+
+
                         var new_hexColors = ['#f7fbff','#deebf7','#c6dbef','#9ecae1','#6baed6','#4292c6','#2171b5','#08519c','#08306b'];
                         var new_legendColor = d3.scaleOrdinal()
                             .domain([0,1,2,3,4,5,6,7,8])
                             .range(new_hexColors);
+
                         var colorScale = d3.scaleQuantile()
                             .domain(thresh)
                             .range(new_hexColors);
+
                         for (var i = 0; i <= 8; i++) {
                             svg.select("rect.legend" + i)
                                 .attr("fill", new_legendColor(i));
+
                             svg.select("text.legend" + i)
                                 .text(thresh[i]);
                         }
+
                         var promises = [d3.json("states-10m.json")]
+
                         Promise.all(promises).then(ready)
+
                         function ready([us]) {
-                    //adding the tooltip
-                    /*
-                    var tip = d3.tip()
-                        .attr("class", "d3-tip")
-                        .offset([-10,0])
-                        .html(function(d){
-                            for (var i = 0; i < quakes.length; i++) {
-                                if (d["properties"].name == quakes[i].states) {
-                                    return "<strong>State: " + quakes[i].states + "</strong><br><strong>Year: " + quakes[i].year + "</strong><br><strong>Math 4 Score: " + quakes[i].total.toFixed(2) + "</strong>";
-                                }
-                            }
-                        });
-                    svg.call(tip);
-                    */
+
+
                     svg.append("g")
                         .attr("class", "states")
                         .selectAll("path")
@@ -406,6 +477,7 @@
                             sel.on("dblclick", reset);
                             sel.on("mouseover", onMouseover);
                             sel.on("mouseout", onMouseout);
+
                             function onMouseout() {
                                 d3.select(this)
                                     .style("fill", function(d){
@@ -419,14 +491,21 @@
                                     })
                             };
                         });
+
                 }
+
+
+
                     });
                 return "valid";
+
                 }
+
                 function onMouseover() {
                     d3.select(this)
                         .style("fill", "orange");
                 };
+
                 function onMouseout() {
                     d3.select(this)
                         .style("fill", function(d){
@@ -439,9 +518,11 @@
                             return colorScale(total);
                         })
                 };
+
                 function onClick(d) {
                         d3.selectAll(".info").remove();
                         d3.selectAll(".tip").remove();
+
                         var bounds = path.bounds(d),
                             dx = (bounds[1][0] - bounds[0][0]),
                             dy = bounds[1][1] - bounds[0][1],
@@ -449,11 +530,13 @@
                             y = (bounds[0][1] + bounds[1][1])/2,
                             scale = .5 / Math.max(dx / w, dy / h),
                             translate = [(w/2 - x)*scale-dx, (h/2 - y)*scale];
+
                         svg.transition()
                             .duration(1000)
                             .style("stroke-width", 1 + "px")
                             .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
-                        var off = 20;
+
+                        var off = 25;
                         svg.append("rect")
                             .attr("class", "info")
                             .attr("x", bounds[1][0] + 50/scale)
@@ -463,6 +546,8 @@
                             .attr("rx", 5)
                             .style("opacity", 0.8)
                             .style("fill", "black");
+
+
                         svg.append("text")
                             .attr("class", "info")
                             .attr("x", bounds[1][0] + 250/scale)
@@ -485,8 +570,11 @@
                                     }
                                 }
                             });
+
+
+
                             d3.selectAll(".tip").remove();
-                            var feats = ["TOTAL_REVENUE","INSTR_TOTAL_EXP_RATIO", "MEDIAN_INCOME", "ALL_STUDENT_TEACHER_RATIO", "avg_att_rate", "povrate"];
+                            var feats = ["FEDERAL_REVENUE","LOCAL_REVENUE", "MEDIAN_INCOME", "ALL_STUDENT_TEACHER_RATIO"];
                             for (var i = 0; i < quakes[1].length; i++) {
                                 temp = quakes[1][i].STATE.split("_");
                                 for (var j = 0; j < temp.length; j++) {
@@ -494,19 +582,29 @@
                                 }
                                 quakes[1][i].STATE = temp.join(" ");
                             }
-                            var yScale = d3.scaleBand()
-                                .domain(feats)
-                                .range([h-padding, padding]);
-                            var xScale = d3.scaleLinear()
-                                .domain([0, d3.max(max)])
-                                .range([padding, w]);
+
+
                             for (var i = 0; i < quakes[1].length; i++) {
                                     if (d["properties"].name == quakes[1][i].STATE) {
+
                                         var estimates = [];
                                         for (var k = 0; k < feats.length; k++) {
-                                            estimates.push(quakes[1][i][feats[k]]);
+                                            estimates.push(Math.abs(quakes[1][i][feats[k]]));
                                         }
+
+                                        var xScale = d3.scaleBand()
+                                            .domain(feats)
+                                            .range([h-padding, padding]);
+                                        var heightScale = d3.scaleLinear()
+                                            .domain([0, d3.max(estimates)+1])
+                                            .range([0, 300/scale]);
+                                        // console.log(bounds);
+
+
+                                        var chart = svg.append("g").attr('translate', 'transform(' + bounds[1][0] + ',' + bounds[0][1] + ')');
+
                                         for (var j = 0; j < feats.length; j++) {
+
                                             /*
                                             svg.append("circle")
                                                 .attr("class", "tip")
@@ -515,21 +613,37 @@
                                                 .attr("r",sizeScale(Math.log(Math.abs(quakes[1][i][feats[j]])), scale))
                                                 .style("fill", "orange");
                                             */
+                                            /*
+                    svg.append("text")
+                        .attr("x", 100)
+                        .attr("y", 100)
+                        .attr("font-size", "30px")
+                        .attr("stroke", "red")
+                        .attr("text-anchor", "end")
+                        .attr("transform", "rotate(-20, 100, 100)")
+                        .text("TESTER");
+                    */
+
                                             svg.append("text")
                                                 .attr("class", "tip")
-                                                .attr("x", bounds[1][0] + 390/scale)
-                                                .attr("y", bounds[0][1] + 1.5*(j+4)*(off/scale))
+                                                .attr("x", bounds[1][0] + 2.3*(j+3)*(off/scale))
+                                                .attr("y", function(){
+                                                        return bounds[0][1] + (370)/scale;
+                                                })
                                                 .attr("text-anchor", "end")
                                                 .attr('fill', 'white')
-                                                .attr("font-size", off/scale + "px")
+                                                .attr("font-size", off/2/scale + "px")
+                                                .attr("transform", "rotate(-30, " + Math.round(bounds[1][0] + 2.3*(j+3)*(off/scale)) + "," + Math.round(bounds[0][1] + (370)/scale) + ")")
                                                 .text(feats[j]);
+
                                             svg.append("rect")
                                                 .attr("class", "tip")
-                                                .attr("x", bounds[1][0] + 400/scale)
-                                                .attr("y", bounds[0][1] + 1.5*(j+4)*(off/scale) - off/scale)
-                                                .attr("width", sizeScale(Math.abs(quakes[1][i][feats[j]]), scale))
-                                                .attr("height", off/scale)
+                                                .attr("x", bounds[1][0] + 2.3*(j+3)*(off/scale) - off/scale)
+                                                .attr("y", bounds[1][1]-heightScale(sizeScale(Math.abs(quakes[1][i][feats[j]]), scale)))
+                                                .attr("width", (off+5)/scale)
+                                                .attr("height", heightScale(sizeScale(Math.abs(quakes[1][i][feats[j]]), scale)))
                                                 .style("fill", "orange");
+
                                             /*
                                             svg.append("text")
                                                 .attr("class", "tip")
@@ -543,24 +657,33 @@
                                         }
                                     }
                                 }
+
                 };
+
                 function sizeScale(input, scale){
-                    if(input < 4/scale){
-                        return 4/scale;
+                    if(input < 1/scale){
+                        return 1/scale;
                     }
                     else{
                         return input;
                     }
                 }
+
                 function reset(){
                     d3.selectAll(".info").remove();
                     d3.selectAll(".tip").remove();
                     d3.selectAll("circle").remove();
+
                     svg.transition()
                         .duration(1000)
                         .style("stroke-width", "1px")
                         .attr('transform', 'translate('+0+','+0+')scale(' + 1 + ")");
+
                 };
+
+
+
+
             });
         </script>
     </body>
