@@ -35,60 +35,8 @@
           /* border: 3px solid green; */
           /* padding: 10px; */
         }
-        #play-button {
-            position: absolute;
-            top: 1050px;
-            left: 600px;
-            background: #6baed6;
-            padding-right: 26px;
-            border-radius: 3px;
-            border: none;
-            color: white;
-            margin: 0;
-            padding: 0 12px;
-            width: 400px;
-            cursor: pointer;
-            height: 30px;
-        }
-        #play-button:hover {
-            background-color: #c6dbef;
-        }
-        #next-button {
-            position: absolute;
-            top: 1050px;
-            left: 1005px;
-            background: #6baed6;
-            padding-right: 26px;
-            border-radius: 3px;
-            border: none;
-            color: white;
-            margin: 0;
-            padding: 0 12px;
-            width: 60px;
-            cursor: pointer;
-            height: 30px;
-        }
-        #next-button:hover {
-            background-color: #c6dbef;
-        }
-        #prev-button {
-            position: absolute;
-            top: 1050px;
-            left: 535px;
-            background: #6baed6;
-            padding-right: 26px;
-            border-radius: 3px;
-            border: none;
-            color: white;
-            margin: 0;
-            padding: 0 12px;
-            width: 60px;
-            cursor: pointer;
-            height: 30px;
-        }
-        #prev-button:hover {
-            background-color: #c6dbef;
-        }
+        
+
         </style>
 
     </head>
@@ -124,15 +72,7 @@
       <!--NAVBAR -->
       <svg height=20></svg>
 
-        <div id="vis">
-            <button id="play-button">Play</button>
-        </div>
-        <div id="vis">
-            <button id="next-button">Next</button>
-        </div>
-        <div id="vis">
-            <button id="prev-button">Prev</button>
-        </div>
+        
         <script type="text/javascript">
             //#696969 gray
             //#ffa500 orange
@@ -273,53 +213,56 @@
                 function ready([us]) {
 
 
-                  var my_paths = svg.append("g")
-                      .attr("class", "states")
-                      .selectAll("path")
-                      .data(topojson.feature(us, us.objects.states).features);
+                    var my_paths = svg.append("g")
+                        .attr("class", "states")
+                        .selectAll("path")
+                        .data(topojson.feature(us, us.objects.states).features);
 
-                      my_paths.enter().append("path")
-                      .style("stroke", "white")
-                      .style("stroke-width", 1)
-                      .attr("d", path)
-                      .style('fill','#f7fbff')
-                      // .style("fill", function(d){
-                      //     var total = 0;
-                      //     for (var i = 0; i < quakes[0].length; i++) {
-                      //         if (d["properties"].name == quakes[0][i].states) {
-                      //             total = quakes[0][i].total;
-                      //         }
-                      //     }
-                      //     return colorScale(total);
-                      // })
-                      .each(function(){
-                          var sel = d3.select(this);
-                          sel.on("click", onClick);
-                          sel.on("dblclick", reset);
-                          sel.on("mouseover", onMouseover)
-                          sel.on("mouseout", onMouseout);
-                      });
-                      var select_paths = d3.selectAll('path');
+                        my_paths.enter().append("path")
+                        .style("stroke", "white")
+                        .style("stroke-width", 1)
+                        .attr("d", path)
+                        .style('fill','#f7fbff')
+                        // .style("fill", function(d){
+                        //     var total = 0;
+                        //     for (var i = 0; i < quakes[0].length; i++) {
+                        //         if (d["properties"].name == quakes[0][i].states) {
+                        //             total = quakes[0][i].total;
+                        //         }
+                        //     }
+                        //     return colorScale(total);
+                        // })
+                        .each(function(){
+                            var sel = d3.select(this);
+                            sel.on("click", onClick);
+                            sel.on("dblclick", reset);
+                            sel.on("mouseover", onMouseover)
+                            sel.on("mouseout", onMouseout);
+                        });
+                        var select_paths = d3.selectAll('path');
 
-                      select_paths.transition().duration(2000).style("fill", function(d){
-                          var total = 0;
-                          for (var i = 0; i < quakes[0].length; i++) {
-                              if (d["properties"].name == quakes[0][i].states) {
-                                  total = quakes[0][i].total;
-                              }
-                          }
-                          return colorScale(total);
-                      })
+                        select_paths.transition().duration(2000).style("fill", function(d){
+                            var total = 0;
+                            for (var i = 0; i < quakes[0].length; i++) {
+                                if (d["properties"].name == quakes[0][i].states) {
+                                    total = quakes[0][i].total;
+                                }
+                            }
+                            return colorScale(total);
+                        })
 
                 }
 
+                /*
                 var playButton = d3.select("#play-button");
                 var nextButton = d3.select("#next-button");
                 var prevButton = d3.select("#prev-button");
+                */
 
                 var num_runs = 0;
                 var update_years = ["2003","2005", "2007", "2009", "2011", "2013", "2015"];
 
+                /*
                 playButton
                     .on("click", function() {
                         var button = d3.select(this);
@@ -375,6 +318,147 @@
                         }
                         update(global_max, update_years[num_runs], num_runs);
                     });
+                    */
+
+                    //test better button
+                    function nextClicker() {
+                        if(num_runs < update_years.length-1){
+                            num_runs += 1;
+                        }
+                        update(global_max, update_years[num_runs], num_runs);
+                    }
+                    function prevClicker() {
+                        if(num_runs >= 1){
+                            num_runs -= 1;
+                        }
+                        update(global_max, update_years[num_runs], num_runs);
+                    }
+                    function playClicker() {
+                        var button = d3.select("text.play-text");
+
+                        if (button.text() == "Pause") {
+                            clearInterval(timer);
+                            console.log("pause");
+                            button.text("Play");
+                        } else {
+                            console.log("play");
+                            var timer = setInterval(function(){ 
+                                num_runs += 1;
+                                button.on("click", function(){
+                                    if(button.text() == "Pause"){
+                                        clearInterval(timer);
+                                        button.text("Play"); 
+                                    } else {
+                                        timer = setInterval(function(){
+                                            num_runs+=1
+                                            var when = update(global_max, update_years[num_runs], num_runs);
+                                            if(when == "invalid"){
+                                                clearInterval(timer);
+                                                button.text("Play");
+                                                num_runs-=1;
+                                            }
+                                        }, 1000);
+                                        button.text("Pause");
+                                    }
+                                    
+                                });
+                                var when = update(global_max, update_years[num_runs], num_runs); 
+                                if(when == "invalid"){
+                                    clearInterval(timer);
+                                    button.text("Play");
+                                    num_runs-=1;
+                                }
+                            }, 1000);
+
+                            button.text("Pause");
+                        }
+                    }
+                    function nextButtonOver(){
+                        d3.select("rect.next-button").style("fill", "#c6dbef");
+                    }
+                    function nextButtonOut(){
+                        d3.select("rect.next-button").style("fill", "#6baed6");
+                    }
+                    function prevButtonOver(){
+                        d3.select("rect.prev-button").style("fill", "#c6dbef");
+                    }
+                    function prevButtonOut(){
+                        d3.select("rect.prev-button").style("fill", "#6baed6");
+                    }
+                    function playButtonOver(){
+                        d3.select("rect.play-button").style("fill", "#c6dbef");
+                    }
+                    function playButtonOut(){
+                        d3.select("rect.play-button").style("fill", "#6baed6");
+                    }
+
+
+                    svg.append("rect")
+                        .attr("class", "next-button")
+                        .attr("x", 805)
+                        .attr("y", 650)
+                        .attr("width", 60)
+                        .attr("height", 30)
+                        .attr("rx", 3)
+                        .attr("fill", "#6baed6")
+                        .on("click", nextClicker)
+                        .on("mouseover", nextButtonOver)
+                        .on("mouseout", nextButtonOut);
+                    svg.append("text")
+                        .attr("x", 835)
+                        .attr("y", 672)
+                        .attr("font-size", "16px")
+                        .attr("fill", "white")
+                        .attr("text-anchor", "middle")
+                        .text("Next")
+                        .on("click", nextClicker)
+                        .on("mouseover", nextButtonOver)
+                        .on("mouseout", nextButtonOut);
+
+                    svg.append("rect")
+                        .attr("class", "prev-button")
+                        .attr("x", 335)
+                        .attr("y", 650)
+                        .attr("width", 60)
+                        .attr("height", 30)
+                        .attr("rx", 3)
+                        .attr("fill", "#6baed6")
+                        .on("click", prevClicker)
+                        .on("mouseover", prevButtonOver)
+                        .on("mouseout", prevButtonOut);
+                    svg.append("text")
+                        .attr("x", 365)
+                        .attr("y", 672)
+                        .attr("font-size", "16px")
+                        .attr("fill", "white")
+                        .attr("text-anchor", "middle")
+                        .text("Prev")
+                        .on("click", prevClicker)
+                        .on("mouseover", prevButtonOver)
+                        .on("mouseout", prevButtonOut);
+
+                    svg.append("rect")
+                        .attr("class", "play-button")
+                        .attr("x", 400)
+                        .attr("y", 650)
+                        .attr("width", 400)
+                        .attr("height", 30)
+                        .attr("rx", 3)
+                        .attr("fill", "#6baed6")
+                        .on("click", playClicker)
+                        .on("mouseover", playButtonOver)
+                        .on("mouseout", playButtonOut);
+                    svg.append("text")
+                        .attr("class", "play-text")
+                        .attr("x", 600)
+                        .attr("y", 672)
+                        .attr("font-size", "16px")
+                        .attr("fill", "white")
+                        .attr("text-anchor", "middle")
+                        .text("Play")
+                        .on("click", playClicker)
+                        .on("mouseover", playButtonOver)
+                        .on("mouseout", playButtonOut);
 
                     //rotations text
                     /*
@@ -467,14 +551,17 @@
                         function ready([us]) {
 
 
-                    svg.append("g")
+
+                    var my_paths = svg.append("g")
                         .attr("class", "states")
                         .selectAll("path")
-                        .data(topojson.feature(us, us.objects.states).features)
-                        .enter().append("path")
+                        .data(topojson.feature(us, us.objects.states).features);
+
+                        my_paths.enter().append("path")
                         .style("stroke", "white")
                         .style("stroke-width", 1)
                         .attr("d", path)
+                        // .style('fill', '#f7fbff')
                         .style("fill", function(d){
                             var total = 0;
                             for (var i = 0; i < quakes[0].length; i++) {
@@ -482,8 +569,21 @@
                                     total = quakes[0][i].total;
                                 }
                             }
-                            return colorScale(total);
-                        })
+                            return colorScale(total); })
+
+                        // var select_paths = d3.selectAll('path');
+                        //
+                        // select_paths.transition().duration(500).style("fill", function(d){
+                        //     var total = 0;
+                        //     for (var i = 0; i < quakes[0].length; i++) {
+                        //         if (d["properties"].name == quakes[0][i].states) {
+                        //             total = quakes[0][i].total;
+                        //         }
+                        //     }
+                        //     return colorScale(total);
+                        // })
+
+
                         .each(function(){
                             var sel = d3.select(this);
                             sel.on("click", onClick);
