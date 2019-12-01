@@ -1,9 +1,13 @@
 // alert('hello')
+
+
 var margin = {top: 30, right: 25, bottom: 100, left: 40},
-  width = 1500 - margin.left - margin.right,
-  height = 450 - margin.top - margin.bottom;
+  width = window.innerWidth - margin.left - margin.right,
+  height = window.innerHeight- 50 - margin.top - margin.bottom;
   gridSize=Math.floor((width-45)/24);
 	legendElementWidth=gridSize*2.665;
+// console.log(window.innerWidth)
+// console.log(window.innerHeight)
 
 
 // var titleDropdown = d3.select(".titleDropdown")
@@ -293,3 +297,6 @@ d3.csv("dat.csv").then(function(wide_data) {
 
 
 });
+
+
+window.onresize = function(){ location.reload(); }
