@@ -273,30 +273,43 @@
                 function ready([us]) {
 
 
-                    svg.append("g")
-                        .attr("class", "states")
-                        .selectAll("path")
-                        .data(topojson.feature(us, us.objects.states).features)
-                        .enter().append("path")
-                        .style("stroke", "white")
-                        .style("stroke-width", 1)
-                        .attr("d", path)
-                        .style("fill", function(d){
-                            var total = 0;
-                            for (var i = 0; i < quakes[0].length; i++) {
-                                if (d["properties"].name == quakes[0][i].states) {
-                                    total = quakes[0][i].total;
-                                }
-                            }
-                            return colorScale(total);
-                        })
-                        .each(function(){
-                            var sel = d3.select(this);
-                            sel.on("click", onClick);
-                            sel.on("dblclick", reset);
-                            sel.on("mouseover", onMouseover)
-                            sel.on("mouseout", onMouseout);
-                        });
+                  var my_paths = svg.append("g")
+                      .attr("class", "states")
+                      .selectAll("path")
+                      .data(topojson.feature(us, us.objects.states).features);
+
+                      my_paths.enter().append("path")
+                      .style("stroke", "white")
+                      .style("stroke-width", 1)
+                      .attr("d", path)
+                      .style('fill','#f7fbff')
+                      // .style("fill", function(d){
+                      //     var total = 0;
+                      //     for (var i = 0; i < quakes[0].length; i++) {
+                      //         if (d["properties"].name == quakes[0][i].states) {
+                      //             total = quakes[0][i].total;
+                      //         }
+                      //     }
+                      //     return colorScale(total);
+                      // })
+                      .each(function(){
+                          var sel = d3.select(this);
+                          sel.on("click", onClick);
+                          sel.on("dblclick", reset);
+                          sel.on("mouseover", onMouseover)
+                          sel.on("mouseout", onMouseout);
+                      });
+                      var select_paths = d3.selectAll('path');
+
+                      select_paths.transition().duration(2000).style("fill", function(d){
+                          var total = 0;
+                          for (var i = 0; i < quakes[0].length; i++) {
+                              if (d["properties"].name == quakes[0][i].states) {
+                                  total = quakes[0][i].total;
+                              }
+                          }
+                          return colorScale(total);
+                      })
 
                 }
 
