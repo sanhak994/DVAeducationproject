@@ -298,5 +298,13 @@ d3.csv("dat.csv").then(function(wide_data) {
 
 });
 
+// Reload page when only width changes. In some browsers nav bar hides when
+// scrolling which is why I can only use width to trigger a reload. 
+var before = $(this).width();
 
-window.onresize = function(){ location.reload(); }
+$(window).resize(function() {
+    var after = $(this).width();
+   if (after != before) {
+      location.reload()
+   }
+})
