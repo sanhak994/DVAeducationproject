@@ -109,8 +109,13 @@ d3.csv("dat.csv").then(function(wide_data) {
       var mousemove = function(d) {
                         tooltip
                           .html(d["States"] + "  " + d['Year']+ "<br>" + d['Value'])
-                          .style("left", (d3.mouse(this)[0]+70) + "px")
-                          .style("top", (d3.mouse(this)[1]+140) + "px")
+                          // .style("left", ( d3.select(this).attr('x')-100  ) + "px")
+                          // .style("top", ( d3.select(this).attr('y')+50  ) + "px")
+
+                          .style("top", (d3.event.pageY + 16) + "px")
+                          .style("left", (d3.event.pageX + 16) + "px");
+
+                          console.log(d3.select(this).attr('x'))
                       }
       var mouseleave = function(d) {
                         tooltip
