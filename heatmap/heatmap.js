@@ -115,7 +115,7 @@ d3.csv("dat.csv").then(function(wide_data) {
                           .style("top", (d3.event.pageY + 16) + "px")
                           .style("left", (d3.event.pageX + 16) + "px");
 
-                          console.log(d3.select(this).attr('x'))
+                          // console.log(d3.select(this).attr('x'))
                       }
       var mouseleave = function(d) {
                         tooltip
