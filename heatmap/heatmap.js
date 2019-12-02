@@ -3,7 +3,7 @@
 
 var margin = {top: 30, right: 25, bottom: 100, left: 40},
   width = window.innerWidth - margin.left - margin.right,
-  height = window.innerHeight- 50 - margin.top - margin.bottom;
+  height = window.innerHeight- 150 - margin.top - margin.bottom;
   gridSize=Math.floor((width-45)/24);
 	legendElementWidth=gridSize*2.665;
 // console.log(window.innerWidth)
