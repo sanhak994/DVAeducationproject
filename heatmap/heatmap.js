@@ -113,7 +113,9 @@ d3.csv("dat.csv").then(function(wide_data) {
                           // .style("top", ( d3.select(this).attr('y')+50  ) + "px")
 
                           .style("top", (d3.event.pageY + 16) + "px")
-                          .style("left", (d3.event.pageX + 16) + "px");
+                          // .style("left", (d3.event.pageX + 16) + "px")
+
+                          .style("left", function() {return d3.event.pageX >(window.innerWidth*.75) ? d3.event.pageX - 150+"px": d3.event.pageX + "px"});
 
                           // console.log(d3.select(this).attr('x'))
                       }
