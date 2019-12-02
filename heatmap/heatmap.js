@@ -3,7 +3,7 @@
 
 var margin = {top: 30, right: 25, bottom: 100, left: 40},
   width = window.innerWidth - margin.left - margin.right,
-  height = window.innerHeight- 150 - margin.top - margin.bottom;
+  height = window.innerHeight- 450 - margin.top - margin.bottom;
   gridSize=Math.floor((width-45)/24);
 	legendElementWidth=gridSize*2.665;
 // console.log(window.innerWidth)
@@ -299,7 +299,7 @@ d3.csv("dat.csv").then(function(wide_data) {
 });
 
 // Reload page when only width changes. In some browsers nav bar hides when
-// scrolling which is why I can only use width to trigger a reload. 
+// scrolling which is why I can only use width to trigger a reload.
 var before = $(this).width();
 
 $(window).resize(function() {
