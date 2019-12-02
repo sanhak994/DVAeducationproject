@@ -2,8 +2,8 @@
 
 
 var margin = {top: 30, right: 25, bottom: 100, left: 40},
-  width = window.innerWidth - margin.left - margin.right,
-  height = window.innerHeight- 450 - margin.top - margin.bottom;
+  width = 1500 - margin.left - margin.right,
+  height = 450- margin.top - margin.bottom;
   gridSize=Math.floor((width-45)/24);
 	legendElementWidth=gridSize*2.665;
 // console.log(window.innerWidth)
@@ -37,7 +37,9 @@ var margin = {top: 30, right: 25, bottom: 100, left: 40},
 
 var myColors = ["#FFEBE7", "#FED7CF", "#FECABF", "#FEB7A7", "#FE9C87", "#FF896F ", "#FF7355", "#FC6241", "#FF2D00"]
 var cols = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-var svgcols = d3.select(".firstrow").append("svg").attr("width", width).attr("height",200)
+var svgcols = d3.select(".firstrow").append("svg")
+                .attr("viewBox", [-75, 0, 1600, 200])
+                // .attr("width", width).attr("height",200)
 
 // legend
 
@@ -77,9 +79,9 @@ d3.csv("dat.csv").then(function(wide_data) {
           // console.log(data)
 
     var svg = d3.select("#my_dataviz")
-                .append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
+                .append("svg").attr("viewBox", [0, 0, 1500, 450])
+                // .attr("width", width + margin.left + margin.right)
+                // .attr("height", height + margin.top + margin.bottom)
                 .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -297,14 +299,3 @@ d3.csv("dat.csv").then(function(wide_data) {
 
 
 });
-
-// Reload page when only width changes. In some browsers nav bar hides when
-// scrolling which is why I can only use width to trigger a reload.
-var before = $(this).width();
-
-$(window).resize(function() {
-    var after = $(this).width();
-   if (after != before) {
-      location.reload()
-   }
-})

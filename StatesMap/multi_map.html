@@ -142,10 +142,11 @@
                 var h = 700;
                 var padding = 100;
 
-                var svg = d3.select("body")
-                    .append("svg")
-                    .attr("width", w)
-                    .attr("height", h);
+                // var svg = d3.select("body")
+                //     .append("svg")
+                //     .attr("width", w)
+                //     .attr("height", h);
+                const svg = d3.select('body').append("svg").attr("viewBox", [0, 0, 1200, 700]);
 
                 var projection = d3.geoAlbersUsa()
                     .scale(1000)
@@ -814,17 +815,6 @@
             // scrolling which is why I can only use width to trigger a reload.
 
 
-        </script>
-
-        <script type="text/javascript">
-        var before = $(this).width();
-
-        $(window).resize(function() {
-            var after = $(this).width();
-           if (after != before) {
-              location.reload()
-           }
-        })
         </script>
 
 
