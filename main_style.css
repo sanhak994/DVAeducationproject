@@ -9,3 +9,17 @@ body{
 .contact{
   font-size: 0.8em;
 }
+
+.main_screen{
+  background-image: linear-gradient(rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.8)),url('static_images/gatech.jpg');
+  background-size: cover;
+}
+
+#inJumbo{
+  background: rgba(0,0,0,0.6)
+}
+
+#main_text{
+  opacity: 1;
+  color:white;
+}
