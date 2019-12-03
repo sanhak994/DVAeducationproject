@@ -34,8 +34,9 @@
         <style>
         svg {
           display: block;
+          margin-right: 25%;
           margin-left: auto;
-          margin-right: auto;
+          /* margin-right: auto; */
           /* width: 80%; */
           /* border: 3px solid green; */
           /* padding: 10px; */
@@ -145,7 +146,7 @@
                 // console.log(quakes[0]);
 
                 //creating the svg and map projection
-                var w = 1200;
+                var w = 1000;
                 var h = 700;
                 var padding = 100;
 
@@ -153,10 +154,12 @@
                 //     .append("svg")
                 //     .attr("width", w)
                 //     .attr("height", h);
-                const svg = d3.select('body').append("svg").attr("viewBox", [100, 0, w, h]);
+                const svg = d3.select('body').append("svg")
+                              .attr('width', w).attr('height', h)
+                              // .attr("viewBox", [0, 0, w, h]);
 
                 var projection = d3.geoAlbersUsa()
-                    .scale(1000)
+                    .scale(800)
                     .translate([w/2, h/2]);
 
                 var path = d3.geoPath()
@@ -661,10 +664,10 @@
                             dy = bounds[1][1] - bounds[0][1],
                             x = (bounds[0][0] + bounds[1][0])/2,
                             y = (bounds[0][1] + bounds[1][1])/2,
-                            scale = (.5 / Math.max(dx / w, dy / h))/3,
+                            scale = (.5 / Math.max(dx / w, dy / h)),
                             translate = [((w/2 - x)*scale-dx), ((h/2 - y)*scale)];
 
-                        var fixed_scale = scale*3;
+                        // var scale = scale*3;
 
 
 
@@ -679,10 +682,10 @@
                         var off = 25;
                         svg.append("rect")
                             .attr("class", "info")
-                            .attr("x", bounds[1][0] + 50/fixed_scale)
-                            .attr("y", bounds[0][1]- 100/fixed_scale)
-                            .attr("width",  400/fixed_scale + "px")
-                            .attr("height",  600/fixed_scale+ "px")
+                            .attr("x", bounds[1][0] + 50/scale)
+                            .attr("y", bounds[0][1]- 100/scale)
+                            .attr("width",  400/scale + "px")
+                            .attr("height",  600/scale+ "px")
                             .attr("rx", 5)
                             .style("opacity", 0.8)
                             .style("fill", "black");
@@ -690,19 +693,19 @@
 
                         svg.append("text")
                             .attr("class", "info")
-                            .attr("x", bounds[1][0] + 250/fixed_scale)
-                            .attr("y", bounds[0][1] - 40/fixed_scale + off/fixed_scale)
+                            .attr("x", bounds[1][0] + 250/scale)
+                            .attr("y", bounds[0][1] - 40/scale + off/scale)
                             .attr("text-anchor", "middle")
                             .attr('fill', 'white')
-                            .attr("font-size", off/fixed_scale + "px")
+                            .attr("font-size", off/scale + "px")
                             .text(d.properties.name);
                         svg.append("text")
                             .attr("class", "info")
-                            .attr("x", bounds[1][0] + 250/fixed_scale)
-                            .attr("y", bounds[0][1] - 40/fixed_scale + 2.5*(off/fixed_scale))
+                            .attr("x", bounds[1][0] + 250/scale)
+                            .attr("y", bounds[0][1] - 40/scale + 2.5*(off/scale))
                             .attr("text-anchor", "middle")
                             .attr('fill', 'white')
-                            .attr("font-size", off/fixed_scale + "px")
+                            .attr("font-size", off/scale + "px")
                             .html(function(){
                                 for (var i = 0; i < quakes[0].length; i++) {
                                     if (d["properties"].name == quakes[0][i].states) {
@@ -737,7 +740,7 @@
                                             .range([h-padding, padding]);
                                         var heightScale = d3.scaleLinear()
                                             .domain([0, d3.max(estimates)+1])
-                                            .range([0, 300/fixed_scale]);
+                                            .range([0, 300/scale]);
                                         // console.log(bounds);
 
 
@@ -766,22 +769,22 @@
 
                                             svg.append("text")
                                                 .attr("class", "tip")
-                                                .attr("x", bounds[1][0] + 2.3*(j+3)*(off/fixed_scale))
+                                                .attr("x", bounds[1][0] + 2.3*(j+3)*(off/scale))
                                                 .attr("y", function(){
-                                                        return bounds[0][1] + (370)/fixed_scale;
+                                                        return bounds[0][1] + (370)/scale;
                                                 })
                                                 .attr("text-anchor", "end")
                                                 .attr('fill', 'white')
-                                                .attr("font-size", off/2/fixed_scale + "px")
-                                                .attr("transform", "rotate(-30, " + Math.round(bounds[1][0] + 2.3*(j+3)*(off/fixed_scale)) + "," + Math.round(bounds[0][1] + (350)/fixed_scale) + ")")
+                                                .attr("font-size", off/2/scale + "px")
+                                                .attr("transform", "rotate(-30, " + Math.round(bounds[1][0] + 2.3*(j+3)*(off/scale)) + "," + Math.round(bounds[0][1] + (350)/scale) + ")")
                                                 .text(feats[j]);
 
                                             svg.append("rect")
                                                 .attr("class", "tip")
-                                                .attr("x", bounds[1][0] + 2.3*(j+3)*(off/fixed_scale) - off/fixed_scale)
-                                                .attr("y", bounds[1][1]-heightScale(sizeScale(Math.abs(quakes[1][i][feats[j]]), fixed_scale)))
-                                                .attr("width", (off+5)/fixed_scale)
-                                                .attr("height", heightScale(sizeScale(Math.abs(quakes[1][i][feats[j]]), fixed_scale)))
+                                                .attr("x", bounds[1][0] + 2.3*(j+3)*(off/scale) - off/scale)
+                                                .attr("y", bounds[1][1]-heightScale(sizeScale(Math.abs(quakes[1][i][feats[j]]), scale)))
+                                                .attr("width", (off+5)/scale)
+                                                .attr("height", heightScale(sizeScale(Math.abs(quakes[1][i][feats[j]]), scale)))
                                                 .style("fill", "orange");
 
                                             /*
@@ -800,9 +803,9 @@
 
                 };
 
-                function sizeScale(input, fixed_scale){
-                    if(input < 1/fixed_scale){
-                        return 1/fixed_scale;
+                function sizeScale(input, scale){
+                    if(input < 1/scale){
+                        return 1/scale;
                     }
                     else{
                         return input;
