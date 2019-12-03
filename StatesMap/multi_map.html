@@ -160,6 +160,8 @@
                 var h = 700;
                 var padding = 100;
 
+                var clicker = 0;
+
                 // var svg = d3.select("body")
                 //     .append("svg")
                 //     .attr("width", w)
@@ -255,21 +257,14 @@
                         .style("stroke-width", 1)
                         .attr("d", path)
                         .style('fill','#f7fbff')
-                        // .style("fill", function(d){
-                        //     var total = 0;
-                        //     for (var i = 0; i < quakes[0].length; i++) {
-                        //         if (d["properties"].name == quakes[0][i].states) {
-                        //             total = quakes[0][i].total;
-                        //         }
-                        //     }
-                        //     return colorScale(total);
-                        // })
+
                         .each(function(){
                             var sel = d3.select(this);
-                            sel.on("click", onClick);
+                            // sel.on("click", onClick);
                             sel.on("dblclick", reset);
                             sel.on("mouseover", onMouseover)
                             sel.on("mouseout", onMouseout)
+                            sel.on('click', compare)
 
                             ;
                         });
@@ -287,72 +282,10 @@
 
                 }
 
-                /*
-                var playButton = d3.select("#play-button");
-                var nextButton = d3.select("#next-button");
-                var prevButton = d3.select("#prev-button");
-                */
 
                 var num_runs = 0;
                 var update_years = ["2003","2005", "2007", "2009", "2011", "2013", "2015"];
 
-                /*
-                playButton
-                    .on("click", function() {
-                        var button = d3.select(this);
-
-                        if (button.text() == "Pause") {
-                            clearInterval(timer);
-                            button.text("Play");
-                        } else {
-                            var timer = setInterval(function(){
-                                num_runs += 1;
-                                playButton.on("click", function(){
-                                    if(d3.select(this).text() == "Pause"){
-                                        clearInterval(timer);
-                                        d3.select(this).text("Play");
-                                    } else {
-                                        timer = setInterval(function(){
-                                            num_runs+=1
-                                            var when = update(global_max, update_years[num_runs], num_runs);
-                                            if(when == "invalid"){
-                                                clearInterval(timer);
-                                                button.text("Play");
-                                                num_runs-=1;
-                                            }
-                                        }, 1000);
-                                        button.text("Pause");
-                                    }
-
-                                });
-                                var when = update(global_max, update_years[num_runs], num_runs);
-                                if(when == "invalid"){
-                                    clearInterval(timer);
-                                    button.text("Play");
-                                    num_runs-=1;
-                                }
-                            }, 1000);
-
-                            button.text("Pause");
-                        }
-                    });
-
-                    nextButton
-                    .on("click", function() {
-                        if(num_runs < update_years.length-1){
-                            num_runs += 1;
-                        }
-                        update(global_max, update_years[num_runs], num_runs);
-                    });
-
-                    prevButton
-                    .on("click", function() {
-                        if(num_runs >= 1){
-                            num_runs -= 1;
-                        }
-                        update(global_max, update_years[num_runs], num_runs);
-                    });
-                    */
 
                     //test better button
                     function nextClicker() {
@@ -620,10 +553,11 @@
 
                         .each(function(){
                             var sel = d3.select(this);
-                            sel.on("click", onClick);
+                            // sel.on("click", onClick);
                             sel.on("dblclick", reset);
                             sel.on("mouseover", onMouseover);
                             sel.on("mouseout", onMouseout)
+                            sel.on('click', compare)
 
                             ;
 
@@ -670,6 +604,7 @@
 
 
                 function onClick(d) {
+                        clicker = 1;
                         d3.selectAll(".info").remove();
                         d3.selectAll(".tip").remove();
 
@@ -827,6 +762,7 @@
                 }
 
                 function reset(){
+                    clicker = 0;
                     d3.selectAll(".info").remove();
                     d3.selectAll(".tip").remove();
                     d3.selectAll("circle").remove();
@@ -837,6 +773,14 @@
                         .attr('transform', 'translate('+0+','+0+')scale(' + 1 + ")");
 
                 };
+
+                function compare(d){
+                  if(clicker==1){
+                    return reset();
+                  }else{
+                    return onClick(d);
+                  }
+                }
 
 
 
