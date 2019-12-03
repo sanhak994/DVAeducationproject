@@ -36,10 +36,17 @@
           display: block;
           margin-right: 25%;
           margin-left: auto;
+          margin-top: -2%;
           /* margin-right: auto; */
           /* width: 80%; */
           /* border: 3px solid green; */
           /* padding: 10px; */
+        }
+
+        .jumbotron{
+          margin-top: 8%;
+          margin-left: 15%;
+          margin-right: 15%;
         }
 
 
@@ -68,7 +75,7 @@
           </div>
         </nav>
       </div>
-      <svg height=100></svg>
+
       <div class="container">
         <div class="jumbotron">
           <h3>Instructions</h3>
@@ -418,7 +425,7 @@
                     svg.append("rect")
                         .attr("class", "next-button")
                         .attr("x", 805)
-                        .attr("y", 650)
+                        .attr("y", 600)
                         .attr("width", 60)
                         .attr("height", 30)
                         .attr("rx", 3)
@@ -428,7 +435,7 @@
                         .on("mouseout", nextButtonOut);
                     svg.append("text")
                         .attr("x", 835)
-                        .attr("y", 672)
+                        .attr("y", 622)
                         .attr("font-size", "16px")
                         .attr("fill", "white")
                         .attr("text-anchor", "middle")
@@ -440,7 +447,7 @@
                     svg.append("rect")
                         .attr("class", "prev-button")
                         .attr("x", 335)
-                        .attr("y", 650)
+                        .attr("y", 600)
                         .attr("width", 60)
                         .attr("height", 30)
                         .attr("rx", 3)
@@ -450,7 +457,7 @@
                         .on("mouseout", prevButtonOut);
                     svg.append("text")
                         .attr("x", 365)
-                        .attr("y", 672)
+                        .attr("y", 622)
                         .attr("font-size", "16px")
                         .attr("fill", "white")
                         .attr("text-anchor", "middle")
@@ -462,7 +469,7 @@
                     svg.append("rect")
                         .attr("class", "play-button")
                         .attr("x", 400)
-                        .attr("y", 650)
+                        .attr("y", 600)
                         .attr("width", 400)
                         .attr("height", 30)
                         .attr("rx", 3)
@@ -473,7 +480,7 @@
                     svg.append("text")
                         .attr("class", "play-text")
                         .attr("x", 600)
-                        .attr("y", 672)
+                        .attr("y", 622)
                         .attr("font-size", "16px")
                         .attr("fill", "white")
                         .attr("text-anchor", "middle")
