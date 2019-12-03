@@ -24,3 +24,13 @@ body{
   opacity: 1;
   color:white;
 }
+
+/* .index_nav {
+  font-size: 3vw;
+} */
+
+@media screen and (max-width: 480px) {
+    .index_nav {
+         font-size:50%;
+    }
+}
